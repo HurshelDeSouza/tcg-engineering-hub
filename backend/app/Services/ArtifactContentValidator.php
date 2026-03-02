@@ -93,8 +93,14 @@ class ArtifactContentValidator
             ],
 
             'module_engineering' => [
-                // Generic structure - can be customized
-                'engineering_notes' => 'nullable|string',
+                'modules' => 'required|array|min:1',
+                'modules.*.module_id' => 'required|integer|exists:modules,id',
+                'modules.*.engineering_approach' => 'required|string|min:10',
+                'modules.*.technical_decisions' => 'required|array|min:1',
+                'modules.*.technical_decisions.*' => 'string',
+                'modules.*.implementation_notes' => 'nullable|string',
+                'modules.*.risks' => 'nullable|array',
+                'modules.*.risks.*' => 'string',
             ],
 
             default => [],
@@ -143,7 +149,12 @@ class ArtifactContentValidator
             ],
 
             'module_engineering' => [
-                'engineering_notes' => 'Optional: Engineering implementation notes',
+                'modules' => 'Array of modules with engineering details',
+                'modules.*.module_id' => 'Reference to existing module',
+                'modules.*.engineering_approach' => 'Engineering approach description (min 10 chars)',
+                'modules.*.technical_decisions' => 'Array of key technical decisions',
+                'modules.*.implementation_notes' => 'Optional: Implementation notes',
+                'modules.*.risks' => 'Optional: Array of identified risks',
             ],
 
             default => [],

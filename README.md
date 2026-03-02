@@ -92,10 +92,14 @@ php artisan test --filter=AuthorizationTest
 ## ✨ Recent Improvements
 
 ### Content Validation (NEW)
-- ✅ **Artifact content_json validation** by type
-- Each artifact type now has specific field requirements
-- Strategic Alignment requires: transformation, supported_decisions, measurable_success
-- Big Picture requires: ecosystem_vision, impacted_domains, success_definition
-- Domain Breakdown requires: domains array with name and objective
-- System Architecture requires: auth_model, api_style, data_model_notes
-- 8 additional tests added (19 total tests now)
+- ✅ **Strict validation for ALL 7 artifact types**
+- Each artifact type has specific required fields enforced at backend level
+- Strategic Alignment: transformation, supported_decisions, measurable_success
+- Big Picture: ecosystem_vision, impacted_domains, success_definition
+- Domain Breakdown: domains array with name and objective
+- Module Matrix: modules_overview with name and domain
+- Module Engineering: modules with engineering_approach and technical_decisions
+- System Architecture: auth_model, api_style, data_model_notes
+- Phase Scope: included_modules and acceptance_criteria
+- **25 tests total** (14 for content validation, 11 for other features)
+- See [ARTIFACT_VALIDATION.md](ARTIFACT_VALIDATION.md) for complete validation rules

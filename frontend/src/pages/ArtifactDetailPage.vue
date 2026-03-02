@@ -59,6 +59,10 @@ import AppLayout from '@/components/common/AppLayout.vue'
 import StatusBadge from '@/components/common/StatusBadge.vue'
 import StrategicAlignmentForm from '@/components/artifact/StrategicAlignmentForm.vue'
 import BigPictureForm from '@/components/artifact/BigPictureForm.vue'
+import DomainBreakdownForm from '@/components/artifact/DomainBreakdownForm.vue'
+import ModuleMatrixForm from '@/components/artifact/ModuleMatrixForm.vue'
+import SystemArchitectureForm from '@/components/artifact/SystemArchitectureForm.vue'
+import PhaseScopeForm from '@/components/artifact/PhaseScopeForm.vue'
 import GenericArtifactForm from '@/components/artifact/GenericArtifactForm.vue'
 
 const route     = useRoute()
@@ -77,6 +81,10 @@ const formComponent = computed(() => {
   const map = {
     strategic_alignment: StrategicAlignmentForm,
     big_picture:         BigPictureForm,
+    domain_breakdown:    DomainBreakdownForm,
+    module_matrix:       ModuleMatrixForm,
+    system_architecture: SystemArchitectureForm,
+    phase_scope:         PhaseScopeForm,
   }
   return map[artifact.value?.type] || GenericArtifactForm
 })

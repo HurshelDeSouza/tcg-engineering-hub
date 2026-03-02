@@ -215,4 +215,190 @@ class ArtifactContentValidationTest extends TestCase
 
         $response->assertOk();
     }
+
+    /** @test */
+    public function module_matrix_requires_modules_overview()
+    {
+        $artifact = Artifact::create([
+            'project_id' => $this->project->id,
+            'type' => 'module_matrix',
+            'status' => 'in_progress',
+            'content_json' => [],
+        ]);
+
+        $response = $this->actingAs($this->admin)
+            ->putJson("/api/v1/projects/{$this->project->id}/artifacts/{$artifact->id}", [
+                'content_json' => [
+                    'modules_overview' => [], // Empty array should fail
+                ],
+            ]);
+
+        $response->assertStatus(422);
+    }
+
+    /** @test */
+    public function module_matrix_accepts_valid_content()
+    {
+        $artifact = Artifact::create([
+            'project_id' => $this->project->id,
+            'type' => 'module_matrix',
+            'status' => 'in_progress',
+            'content_json' => [],
+        ]);
+
+        $response = $this->actingAs($this->admin)
+            ->putJson("/api/v1/projects/{$this->project->id}/artifacts/{$artifact->id}", [
+                'content_json' => [
+                    'modules_overview' => [
+                        [
+                            'name' => 'Authentication Module',
+                            'domain' => 'Auth',
+                            'priority' => 'high',
+                            'phase' => 'Phase 1',
+                        ],
+                        [
+                            'name' => 'Catalog Module',
+                            'domain' => 'Catalog',
+                            'priority' => 'medium',
+                        ],
+                    ],
+                ],
+            ]);
+
+        $response->assertOk();
+    }
+
+    /** @test */
+    public function module_engineering_requires_structured_content()
+    {
+        $module = \App\Models\Module::create([
+            'project_id' => $this->project->id,
+            'domain' => 'Auth',
+            'name' => 'Auth Module',
+            'status' => 'validated',
+            'objective' => 'Handle authentication',
+            'inputs' => ['credentials'],
+            'outputs' => ['token'],
+            'responsibility' => 'Backend team',
+        ]);
+
+        $artifact = Artifact::create([
+            'project_id' => $this->project->id,
+            'type' => 'module_engineering',
+            'status' => 'in_progress',
+            'content_json' => [],
+        ]);
+
+        // Should fail without required fields
+        $response = $this->actingAs($this->admin)
+            ->putJson("/api/v1/projects/{$this->project->id}/artifacts/{$artifact->id}", [
+                'content_json' => [
+                    'modules' => [
+                        ['module_id' => $module->id], // Missing required fields
+                    ],
+                ],
+            ]);
+
+        $response->assertStatus(422);
+    }
+
+    /** @test */
+    public function module_engineering_accepts_valid_content()
+    {
+        $module = \App\Models\Module::create([
+            'project_id' => $this->project->id,
+            'domain' => 'Auth',
+            'name' => 'Auth Module',
+            'status' => 'validated',
+            'objective' => 'Handle authentication',
+            'inputs' => ['credentials'],
+            'outputs' => ['token'],
+            'responsibility' => 'Backend team',
+        ]);
+
+        $artifact = Artifact::create([
+            'project_id' => $this->project->id,
+            'type' => 'module_engineering',
+            'status' => 'in_progress',
+            'content_json' => [],
+        ]);
+
+        $response = $this->actingAs($this->admin)
+            ->putJson("/api/v1/projects/{$this->project->id}/artifacts/{$artifact->id}", [
+                'content_json' => [
+                    'modules' => [
+                        [
+                            'module_id' => $module->id,
+                            'engineering_approach' => 'JWT-based authentication with refresh tokens',
+                            'technical_decisions' => [
+                                'Use bcrypt for password hashing',
+                                'Implement rate limiting',
+                            ],
+                            'implementation_notes' => 'Follow OAuth 2.0 best practices',
+                            'risks' => ['Token theft', 'Brute force attacks'],
+                        ],
+                    ],
+                ],
+            ]);
+
+        $response->assertOk();
+    }
+
+    /** @test */
+    public function phase_scope_requires_included_modules()
+    {
+        $artifact = Artifact::create([
+            'project_id' => $this->project->id,
+            'type' => 'phase_scope',
+            'status' => 'in_progress',
+            'content_json' => [],
+        ]);
+
+        $response = $this->actingAs($this->admin)
+            ->putJson("/api/v1/projects/{$this->project->id}/artifacts/{$artifact->id}", [
+                'content_json' => [
+                    'acceptance_criteria' => ['Criterion 1'],
+                    // Missing included_modules
+                ],
+            ]);
+
+        $response->assertStatus(422);
+    }
+
+    /** @test */
+    public function phase_scope_accepts_valid_content()
+    {
+        $module = \App\Models\Module::create([
+            'project_id' => $this->project->id,
+            'domain' => 'Auth',
+            'name' => 'Auth Module',
+            'status' => 'validated',
+            'objective' => 'Handle authentication',
+            'inputs' => ['credentials'],
+            'outputs' => ['token'],
+            'responsibility' => 'Backend team',
+        ]);
+
+        $artifact = Artifact::create([
+            'project_id' => $this->project->id,
+            'type' => 'phase_scope',
+            'status' => 'in_progress',
+            'content_json' => [],
+        ]);
+
+        $response = $this->actingAs($this->admin)
+            ->putJson("/api/v1/projects/{$this->project->id}/artifacts/{$artifact->id}", [
+                'content_json' => [
+                    'included_modules' => [$module->id],
+                    'excluded_items' => ['Mobile app', 'Admin panel'],
+                    'acceptance_criteria' => [
+                        'All tests passing',
+                        'Code review completed',
+                        'Documentation updated',
+                    ],
+                ],
+            ]);
+
+        $response->assertOk();
+    }
 }
