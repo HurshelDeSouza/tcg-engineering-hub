@@ -86,3 +86,16 @@ php artisan test --filter=AuthorizationTest
 4. **WebSockets**: Real-time collaboration in the artifact editor.
 5. **Module Versioning**: Complete version history, not just `version_note`.
 6. **Domain table**: Separate domains as an entity for better normalization.
+
+---
+
+## ✨ Recent Improvements
+
+### Content Validation (NEW)
+- ✅ **Artifact content_json validation** by type
+- Each artifact type now has specific field requirements
+- Strategic Alignment requires: transformation, supported_decisions, measurable_success
+- Big Picture requires: ecosystem_vision, impacted_domains, success_definition
+- Domain Breakdown requires: domains array with name and objective
+- System Architecture requires: auth_model, api_style, data_model_notes
+- 8 additional tests added (19 total tests now)

@@ -7,6 +7,7 @@ use App\Http\Resources\ArtifactResource;
 use App\Models\Artifact;
 use App\Models\Project;
 use App\Services\ArtifactGateService;
+use App\Services\ArtifactContentValidator;
 use App\Services\AuditService;
 use Illuminate\Http\Request;
 
@@ -14,6 +15,7 @@ class ArtifactController extends Controller
 {
     public function __construct(
         private readonly ArtifactGateService $gateService,
+        private readonly ArtifactContentValidator $contentValidator,
         private readonly AuditService $auditService,
     ) {}
 
@@ -38,6 +40,11 @@ class ArtifactController extends Controller
             'owner_user_id' => 'nullable|exists:users,id',
             'content_json'  => 'nullable|array',
         ]);
+
+        // Validate content_json structure based on artifact type
+        if (!empty($data['content_json'])) {
+            $this->contentValidator->validate($data['type'], $data['content_json']);
+        }
 
         $artifact = $project->artifacts()->create([
             ...$data,
@@ -70,6 +77,11 @@ class ArtifactController extends Controller
             'owner_user_id' => 'nullable|exists:users,id',
             'content_json'  => 'nullable|array',
         ]);
+
+        // Validate content_json structure based on artifact type
+        if (isset($data['content_json'])) {
+            $this->contentValidator->validate($artifact->type, $data['content_json']);
+        }
 
         $artifact->update($data);
 
