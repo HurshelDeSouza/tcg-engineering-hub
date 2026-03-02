@@ -1,32 +1,32 @@
-# Notas de Arquitectura — TCG Engineering Hub
+# Architecture Notes — TCG Engineering Hub
 
-## Decisiones clave
+## Key Decisions
 
 **Domain Services > Controllers**
-Las reglas de negocio viven en `ArtifactGateService`. Los controllers sólo coordinan: reciben la request, llaman al service, devuelven la response. Esto permite testear las reglas de forma aislada sin HTTP overhead.
+Business rules live in `ArtifactGateService`. Controllers only coordinate: receive the request, call the service, return the response. This allows testing rules in isolation without HTTP overhead.
 
-**Policies RBAC completas**
-Cada entidad (Project, Artifact, Module) tiene su `Policy`. Los métodos del controller llaman `$this->authorize()` — cero checks de rol hardcodeados. El admin tiene acceso total; viewer es read-only.
+**Complete RBAC Policies**
+Each entity (Project, Artifact, Module) has its `Policy`. Controller methods call `$this->authorize()` — zero hardcoded role checks. Admin has full access; viewer is read-only.
 
-**Audit como evento, no como log**
-`AuditService` recibe el before/after state y genera un diff real. Sólo se guardan los campos que realmente cambiaron (`logUpdated`). Esto hace la timeline útil y no ruidosa.
+**Audit as event, not as log**
+`AuditService` receives the before/after state and generates a real diff. Only fields that actually changed are saved (`logUpdated`). This makes the timeline useful and not noisy.
 
-**JSON flexible + validación estricta**
-`content_json` permite flexibilidad por tipo de artifact sin crear 7 tablas distintas. La validación se hace en los controllers antes de persistir (array rules en FormRequest / inline validation).
+**Flexible JSON + strict validation**
+`content_json` allows flexibility per artifact type without creating 7 different tables. Validation is done in controllers before persisting (array rules in FormRequest / inline validation).
 
-**Gate 3 configurable**
-`config/tcg.php` define `min_validated_modules` con env var `TCG_MIN_VALIDATED_MODULES`. Cambiar el threshold no requiere tocar código.
+**Configurable Gate 3**
+`config/tcg.php` defines `min_validated_modules` with env var `TCG_MIN_VALIDATED_MODULES`. Changing the threshold doesn't require touching code.
 
 ---
 
-## Qué mejoraría en la siguiente iteración
+## What I Would Improve in the Next Iteration
 
-1. **Project Templates** — Al crear proyecto, elegir un preset que auto-genera los 7 artifacts en `not_started` con `content_json` pre-poblado de ejemplos. Evita que el equipo empiece desde cero.
+1. **Project Templates** — When creating a project, choose a preset that auto-generates the 7 artifacts in `not_started` with `content_json` pre-populated with examples. Prevents the team from starting from scratch.
 
-2. **Export JSON** — `GET /api/v1/projects/{id}/export` retorna el proyecto completo (artifacts + modules + audit) como JSON descargable. Útil para handoffs o auditorías externas.
+2. **Export JSON** — `GET /api/v1/projects/{id}/export` returns the complete project (artifacts + modules + audit) as downloadable JSON. Useful for handoffs or external audits.
 
-3. **Notificaciones en tiempo real** — Usar Laravel Broadcasting + Pusher para que el PM vea en tiempo real cuando un engineer marca un módulo como validado.
+3. **Real-time Notifications** — Use Laravel Broadcasting + Pusher so the PM sees in real-time when an engineer marks a module as validated.
 
-4. **Versionado completo de Modules** — Actualmente solo hay `version_note` (string). La próxima versión guardaría snapshots completos en una tabla `module_versions` con diff entre versiones.
+4. **Complete Module Versioning** — Currently there's only `version_note` (string). The next version would save complete snapshots in a `module_versions` table with diff between versions.
 
-5. **Domain como entidad** — Separar `domain` de módulos a una tabla `domains` para poder listar todos los dominios de un proyecto, asignarles owner, y navegar por dominio.
+5. **Domain as entity** — Separate `domain` from modules to a `domains` table to be able to list all domains of a project, assign them owners, and navigate by domain.

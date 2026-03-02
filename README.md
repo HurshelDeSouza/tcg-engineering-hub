@@ -1,8 +1,8 @@
 # TCG Engineering Hub — MVP SaaS
 
-## 📋 Traducción del Challenge
+## 📋 Overview
 
-El sistema es un **SaaS interno** para The Cloud Group que digitaliza el TCG Engineering Framework.
+This system is an **internal SaaS** for The Cloud Group that digitalizes the TCG Engineering Framework.
 Stack: **Laravel 11 (API)** + **Vue 3 (UI)**
 
 ---
@@ -16,7 +16,7 @@ cd backend
 composer install
 cp .env.example .env
 php artisan key:generate
-# Configurar DB en .env (MySQL recomendado)
+# Configure DB in .env (MySQL recommended)
 php artisan migrate --seed
 php artisan serve
 ```
@@ -33,9 +33,9 @@ npm run dev
 
 ---
 
-## 👥 Usuarios demo (seed)
+## 👥 Demo Users (seeded)
 
-| Email                    | Password | Rol      |
+| Email                    | Password | Role     |
 |--------------------------|----------|----------|
 | admin@tcg.com            | password | admin    |
 | pm@tcg.com               | password | pm       |
@@ -44,12 +44,12 @@ npm run dev
 
 ---
 
-## 🧪 Ejecutar Tests
+## 🧪 Running Tests
 
 ```bash
 cd backend
 php artisan test
-# O específicamente:
+# Or specifically:
 php artisan test --filter=GateTest
 php artisan test --filter=ModuleValidationTest
 php artisan test --filter=ProjectTransitionTest
@@ -58,31 +58,31 @@ php artisan test --filter=AuthorizationTest
 
 ---
 
-## 🏗️ Decisiones de Arquitectura
+## 🏗️ Architecture Decisions
 
 ### Backend (Laravel)
 
-- **RBAC con Policies/Gates**: Cada entidad tiene su Policy. Las reglas de negocio **NUNCA** van en controllers.
-- **ArtifactGateService**: Servicio de dominio que encapsula todas las reglas (Gates 1-4). Inyectable y testeable.
-- **AuditService**: Observer pattern — cada cambio de estado dispara log automático con before/after JSON diff.
-- **Sanctum**: Autenticación stateless con tokens para SPA.
-- **Soft Deletes**: Projects usan `deleted_at` para archivado.
-- **Resources**: Todas las respuestas pasan por API Resources para formato consistente.
+- **RBAC with Policies/Gates**: Each entity has its Policy. Business rules **NEVER** go in controllers.
+- **ArtifactGateService**: Domain service that encapsulates all rules (Gates 1-4). Injectable and testable.
+- **AuditService**: Observer pattern — each state change triggers automatic log with before/after JSON diff.
+- **Sanctum**: Stateless authentication with tokens for SPA.
+- **Soft Deletes**: Projects use `deleted_at` for archiving.
+- **Resources**: All responses go through API Resources for consistent format.
 
 ### Frontend (Vue 3)
 
-- **Pinia**: Estado global (auth, projects).
-- **Vue Router**: Guards de autenticación por ruta.
-- **Composables**: `usePermissions`, `useGates` reutilizables.
-- **Estilo Vuexy**: Layout con sidebar, cards con sombra, badges de estado con colores.
+- **Pinia**: Global state (auth, projects).
+- **Vue Router**: Authentication guards per route.
+- **Composables**: Reusable `usePermissions`, `useGates`.
+- **Vuexy Style**: Layout with sidebar, shadowed cards, colored status badges.
 
 ---
 
-## 🔮 Qué mejoraría (Next Steps)
+## 🔮 What I Would Improve (Next Steps)
 
-1. **Templates**: Al crear proyecto, ofrecer "preset" que auto-crea los 7 artifacts en `not_started`.
-2. **Export JSON**: Endpoint `/api/v1/projects/{id}/export` que devuelve el proyecto completo con artifacts y modules.
-3. **Notificaciones**: Cuando un artifact cambia a `done`, notificar al PM vía email/broadcast.
-4. **WebSockets**: Colaboración en tiempo real en el editor de artifacts.
-5. **Versionado de Modules**: Historial completo de versiones, no solo `version_note`.
-6. **Domain table**: Separar dominios como entidad para mejor normalización.
+1. **Templates**: When creating a project, offer a "preset" that auto-creates the 7 artifacts in `not_started`.
+2. **Export JSON**: Endpoint `/api/v1/projects/{id}/export` that returns the complete project with artifacts and modules.
+3. **Notifications**: When an artifact changes to `done`, notify the PM via email/broadcast.
+4. **WebSockets**: Real-time collaboration in the artifact editor.
+5. **Module Versioning**: Complete version history, not just `version_note`.
+6. **Domain table**: Separate domains as an entity for better normalization.
